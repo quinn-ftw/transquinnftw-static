@@ -1,0 +1,2 @@
+import{r as s}from"./index-DBvZCzBm.js";let e=null,n=null;async function u(){try{const t=await fetch("/photos/page-illustrations.json");return t.ok?await t.json():{}}catch{return{}}}function o(){return e!==null?Promise.resolve(e):(n||(n=u().then(t=>(e=t,t))),n)}function i(){const[t,r]=s.useState(e??{});return s.useEffect(()=>{if(e!==null){r(e);return}o().then(r)},[]),t}export{i as u};
+//# sourceMappingURL=usePageIllustrations-D3P9Ia7w.js.map

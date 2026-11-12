@@ -1,0 +1,20 @@
+{
+  "duos": {
+    "image": "duo-session.png",
+    "side": "right",
+    "height": "400px",
+    "opacity": 0.85
+  },
+  "specialties": {
+    "image": "specialties-solo.png",
+    "side": "right",
+    "height": "380px",
+    "opacity": 0.85
+  },
+  "destinations": {
+    "image": "destinations-travel.png",
+    "side": "right",
+    "height": "380px",
+    "opacity": 0.85
+  }
+}

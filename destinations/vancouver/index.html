@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#FFF4FA" />
+    <!--
+      Pre-paint theme chrome + the A/B draw. Runs before any stylesheet or the
+      module bundle, so the first painted frame already carries the theme this
+      load will render. With no pinned choice it DRAWS one of the two variants
+      (pair cached by themes/registry.ts) and records it in
+      `quinn-www:pending-visit-theme`, which resolveSiteTheme() then honours —
+      the draw lives here so the paint and the render can never disagree. With
+      nothing cached (first-ever visit) the static defaults below paint and the
+      app draws for itself.
+    -->
+    <script>
+      (function () {
+        try {
+          var store = window.localStorage;
+          var pinned = store.getItem('quinn-www:visitor-theme');
+          var chrome = null;
+          if (pinned) {
+            // An explicit toggle choice wins; no draw happens this load.
+            store.removeItem('quinn-www:pending-visit-theme');
+            var raw = store.getItem('quinn-www:boot-chrome');
+            chrome = raw ? JSON.parse(raw) : null;
+          } else {
+            // A/B: draw a variant here, paint it, and tell the app which one it
+            // must render (themes/registry.ts reads the pending key).
+            var choices = JSON.parse(store.getItem('quinn-www:visit-chrome-choices') || 'null');
+            if (choices && choices.length) {
+              chrome = choices[Math.floor(Math.random() * choices.length)];
+              store.setItem('quinn-www:pending-visit-theme', chrome.name);
+            } else {
+              // First-ever visit: nothing cached, so the static defaults paint
+              // and the app draws for itself.
+              store.removeItem('quinn-www:pending-visit-theme');
+            }
+          }
+          if (!chrome || typeof chrome.name !== 'string') return;
+          var root = document.documentElement;
+          root.setAttribute('data-site-theme', chrome.name);
+          if (typeof chrome.themeColor === 'string' && chrome.themeColor) {
+            root.style.setProperty('--boot-bg', chrome.themeColor);
+            var meta = document.querySelector('meta[name="theme-color"]');
+            if (meta) meta.setAttribute('content', chrome.themeColor);
+          }
+        } catch (e) {
+          /* storage unavailable — static defaults paint */
+        }
+      })();
+    </script>
+
+    <!-- Search engines: index. AI training: opt out. -->
+    <meta name="robots" content="index, follow, noai, noimageai, noimageindex" />
+
+    <!-- Privacy -->
+    <meta name="referrer" content="no-referrer" />
+
+    <link rel="preload" href="/fonts/PlayfairDisplay-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/PlayfairDisplay-Bold.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      @font-face {
+        font-family: 'Playfair Display';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url('/fonts/PlayfairDisplay-Regular.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Playfair Display';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url('/fonts/PlayfairDisplay-Bold.woff2') format('woff2');
+      }
+      /* Kuromi display faces (same faces as the photo watermark). Declared
+         here but only fetched when an active Kuromi theme renders headings in
+         them — the default dark-luxe theme never references these families. */
+      @font-face {
+        font-family: 'Audiowide';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url('/fonts/Audiowide-Regular.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Orbitron';
+        font-style: normal;
+        font-weight: 400 900;
+        font-display: swap;
+        src: url('/fonts/Orbitron-Variable.woff2') format('woff2-variations');
+      }
+      /* Quinn Heart — Poppins (OFL) with the tittle of lowercase i/j redrawn as
+         a heart (built by tooling/heart-font/build.py). The heart is part of the
+         glyph outline, so it inherits the heading text colour. Used as the lead
+         heading face for the Cali Barbie themes ("Quinn" → "Qu♥nn"); only fetched
+         when one of those themes renders headings. */
+      @font-face {
+        font-family: 'Quinn Heart';
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+        src: url('/fonts/QuinnHeart-SemiBold.woff2') format('woff2');
+      }
+      @font-face {
+        font-family: 'Quinn Heart';
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: url('/fonts/QuinnHeart-Bold.woff2') format('woff2');
+      }
+    </style>
+
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/apple-touch-icon.png" />
+
+    <!--
+      STATIC, PRE-JS META. This is what a crawler and a link-preview scraper
+      read: they do not run the SPA, so whatever is written here IS the site's
+      public identity in search results and in a shared link.
+
+      It must therefore only ever carry the PUBLIC brand. It previously carried
+      an internal marketing handle that had not been made public, and every
+      shared link published it.
+    -->
+    <title>Quinn — Trans Escort, West Hollywood &amp; Touring Nationwide</title>
+    <meta
+      name="description"
+      content="Quinn — upscale trans companion in West Hollywood, Los Angeles. Girlfriend experience, incall and outcall, touring nationwide. Bookings by text."
+    />
+    <link rel="canonical" href="https://transquinnftw.com/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="profile" />
+    <meta property="og:site_name" content="Quinn" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://transquinnftw.com/" />
+    <meta property="og:title" content="Quinn — Trans Escort in West Hollywood" />
+    <meta
+      property="og:description"
+      content="Upscale trans companion in West Hollywood, Los Angeles. GFE, incall and outcall, touring nationwide."
+    />
+    <!--
+      Canonical host, spelled with the double n. This pointed at
+      transquinftw.com, a real redirect domain we own, so every preview image
+      was served through a 301 that many scrapers do not follow — the card
+      rendered without art.
+    -->
+    <meta property="og:image" content="https://transquinnftw.com/www/gallery-media/3/453" />
+    <meta property="og:image:alt" content="Quinn" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Quinn — Trans Escort in West Hollywood" />
+    <meta
+      name="twitter:description"
+      content="Upscale trans companion in West Hollywood, Los Angeles. GFE, incall and outcall, touring nationwide."
+    />
+    <meta name="twitter:image" content="https://transquinnftw.com/www/gallery-media/3/453" />
+
+    <script type="module" crossorigin src="/assets/index-DBvZCzBm.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CluiG4zC.css">
+  </head>
+  <!-- `--boot-bg` is set by the pre-paint script above from the last applied
+       theme; the literal is the baked default (Cali Barbie · Malibu). -->
+  <body style="background-color: var(--boot-bg, #FFF4FA);">
+    <div id="root"></div>
+  </body>
+</html>

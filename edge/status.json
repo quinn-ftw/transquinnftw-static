@@ -1,0 +1,1 @@
+{"ts":"2026-11-10T21:20:31.351Z","blackReachable":true,"store":"http","forms":{"contact":{"enabled":true,"dependsOn":"bookings"},"touring":{"enabled":true,"dependsOn":"newsletter"},"waitlist":{"enabled":true,"dependsOn":"newsletter"},"booking":{"enabled":true,"dependsOn":"bookings"},"newsletter":{"enabled":true,"dependsOn":"newsletter"}}}
